@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Report</title>
+</head>
+<body>
+
+<h1>PathWise Report</h1>
+
+<h3>Career Goal</h3>
+<p>{{ career }}</p>
+
+<h3>Your Skills</h3>
+<ul>
+{% for skill in user_skills %}
+<li>{{ skill }}</li>
+{% endfor %}
+</ul>
+
+<h3>Missing Skills</h3>
+<ul>
+{% for skill in missing_skills %}
+<li>{{ skill }}</li>
+{% endfor %}
+</ul>
+
+<h3>Career Readiness</h3>
+<p>{{ readiness }}%</p>
+
+<a href="/">Back Home</a>
+
+</body>
+</html>
