@@ -1,12 +1,25 @@
 from flask import Flask, render_template, request
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 
-students = []
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///pathwise.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
+
+
+class Student(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100))
+    email = db.Column(db.String(100))
+    career = db.Column(db.String(100))
+
 
 @app.route("/")
 def home():
     return render_template("home.html")
+
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -19,7 +32,14 @@ def register():
             "career": request.form["career"]
         }
 
-        students.append(student)
+        new_student = Student(
+            name=student["name"],
+            email=student["email"],
+            career=student["career"]
+        )
+
+        db.session.add(new_student)
+        db.session.commit()
 
         return f"""
         <h2>Registration Successful!</h2>
@@ -30,6 +50,16 @@ def register():
         """
 
     return render_template("register.html")
+
+@app.route("/students")
+def students():
+
+    all_students = Student.query.all()
+
+    return render_template(
+        "dashboard.html",
+        students=all_students
+    )
 @app.route("/skill-gap", methods=["GET", "POST"])
 def skill_gap():
 
@@ -71,5 +101,11 @@ def skill_gap():
         )
 
     return render_template("skill_gap.html")
+
+
+with app.app_context():
+    db.create_all()
+
+
 if __name__ == "__main__":
     app.run(debug=True)
